@@ -1,4 +1,4 @@
-name: 'Terraform Preview'
+name: 'Terraform'
 
 on:
   push:
@@ -26,6 +26,9 @@ env:
   PM_PASS: ${{ secrets.PM_PASS }}
   PG_CONN_STR: ${{ secrets.PG_CONN_STR }}
   TF_VAR_github_token: ${{ secrets.TF_VAR_GITHUB_TOKEN }}
+  DNS_UPDATE_KEYNAME: "tsig-key."
+  DNS_UPDATE_KEYSECRET: ${{ secrets.DNS_UPDATE_KEYSECRET }}
+  DNS_UPDATE_KEYALGORITHM: hmac-sha256
 
 
 jobs:
@@ -45,4 +48,4 @@ jobs:
         run: terraform -chdir=infrastructure plan
       - name: Terraform Apply
         if: ${{ inputs.action == 'apply'}}
-        run: terraform -chdir=infrastructure apply -auto-approve 
+        run: terraform -chdir=infrastructure apply -auto-approve

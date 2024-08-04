@@ -1,0 +1,10 @@
+name: Ping
+on:
+  workflow_dispatch: null
+
+jobs:
+  ping:
+    runs-on: self-hosted
+    steps:
+      - name: Ping
+        run: ping -c 5 pxm.ross.in

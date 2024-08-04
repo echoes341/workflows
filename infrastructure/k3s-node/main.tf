@@ -1,3 +1,14 @@
+terraform {
+  required_providers {
+    proxmox = {
+      source = "telmate/proxmox"
+    }
+    dns = {
+      source = "hashicorp/dns"
+    }
+  }
+}
+
 variable "ip" {
   type = string
 }
@@ -38,10 +49,12 @@ resource "proxmox_vm_qemu" "k3s-vm" {
     }
     scsi {
       scsi0 {
-        cache      = "none"
-        emulatessd = true
-        size       = "20G"
-        storage    = "local-lvm"
+        disk {
+          cache      = "none"
+          emulatessd = true
+          size       = "20G"
+          storage    = "local-lvm"
+        }
       }
     }
   }

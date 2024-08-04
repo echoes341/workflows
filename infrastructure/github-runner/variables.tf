@@ -19,3 +19,7 @@ variable "ip" {
   description = "IP address of the runner"
   type        = string
 }
+
+output "ip" {
+  value = var.ip
+}

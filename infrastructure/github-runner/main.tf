@@ -1,44 +1,17 @@
-terraform {
-  required_providers {
-    proxmox = {
-      source = "telmate/proxmox"
-    }
-  }
+module "lxc" {
+  source   = "../modules/lxc"
+  ip       = var.ip
+  password = "github-runner"
+  name     = "github-runner"
 }
 
-resource "proxmox_lxc" "github_runner" {
-  target_node  = "proxmox"
-  hostname     = var.name
-  password     = "github-runner"
-  ostemplate   = "local:vztmpl/ubuntu-23.10-standard_23.10-1_amd64.tar.zst"
-  unprivileged = true
-  onboot       = true
-  start        = true
-  memory       = 1024
-  tags         = "runners"
-
-  ssh_public_keys = <<-EOT
-  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIZS5DCA1uPMpvWfjYZQRqW/ZxDOKVzIokAzRMtY0TGi gianpaolo@gethank.com
-  EOT
-
-  rootfs {
-    size    = "8G"
-    storage = "local-lvm"
-  }
-
-  network {
-    name   = "eth0"
-    bridge = "vmbr0"
-    ip     = "${var.ip}/24"
-    gw     = "192.168.1.254"
-  }
-
+resource "null_resource" "install" {
   connection {
-    type     = "ssh"
-    host     = var.ip
-    user     = "root"
-    password = "github-runner"
+    type = "ssh"
+    host = var.ip
+    user = "root"
   }
+  depends_on = [module.lxc]
 
   provisioner "file" {
     source      = "${path.module}/scripts/docker.sh"

@@ -8,34 +8,41 @@ variable "password" {
 
 variable "name" {}
 
-module "lxc" {
-  source   = "../modules/lxc"
-  ip       = var.ip
-  password = var.password
-  name     = var.name
-  memory   = 4096
-}
+resource "proxmox_vm_qemu" "k3s-vm" {
+  name        = var.name
+  target_node = "proxmox"
+  bios        = "ovmf"
+  onboot      = true
+  memory      = 4096
+  cores       = 4
+  boot        = "order=ide2;scsi0"
+  os_type     = "centos"
+  agent       = 1
 
-resource "null_resource" "install" {
-  connection {
-    type = "ssh"
-    host = var.ip
-    user = "root"
-  }
-  depends_on = [module.lxc]
-
-  provisioner "file" {
-    source      = "./github-runner/scripts/docker.sh"
-    destination = "/tmp/docker.sh"
+  network {
+    bridge    = "vmbr0"
+    firewall  = false
+    link_down = false
+    model     = "virtio"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "apt-get update",
-      "apt-get install -y curl ca-certificates",
-      "chmod +x /tmp/docker.sh",
-      "/tmp/docker.sh",
-      "curl -sfL https://get.k3s.io | sh -s - --docker"
-    ]
+  ipconfig0 = "gw=192.168.1.254,ip=${var.ip}/24"
+
+  disks {
+    ide {
+      ide2 {
+        cdrom {
+          iso = "Rocky-9-latest-x86_64-boot.iso"
+        }
+      }
+    }
+    scsi {
+      scsi0 {
+        cache      = "none"
+        emulatessd = true
+        size       = "20G"
+        storage    = "local-lvm"
+      }
+    }
   }
 }

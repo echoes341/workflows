@@ -3,8 +3,3 @@ variable "github_token" {
   type        = string
   sensitive   = false
 }
-
-variable "scanservjs_password" {
-  type      = string
-  sensitive = true
-}

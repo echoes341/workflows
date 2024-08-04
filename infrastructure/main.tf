@@ -9,9 +9,8 @@ module "github-runner" {
   ip                       = "192.168.1.109"
 }
 
-module "scanservjs" {
-  source   = "./scanservjs"
-  ip       = "192.168.1.123"
-  password = var.scanservjs_password
-  name     = "scanservjs"
+module "k3s-node-1" {
+  source = "./k3s-node"
+  ip     = "192.168.1.110"
+  name   = "k3s-node-1"
 }

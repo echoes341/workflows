@@ -3,3 +3,10 @@ variable "github_token" {
   type        = string
   sensitive   = false
 }
+
+variable "kubernetes_config_path" {
+  description = "Path to the kubeconfig file"
+  type        = string
+  sensitive   = false
+  default     = "~/.kube/config"
+}

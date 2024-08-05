@@ -9,6 +9,11 @@ terraform {
       source  = "hashicorp/dns"
       version = "3.4.1"
     }
+
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.31.0"
+    }
   }
 }
 
@@ -20,4 +25,8 @@ provider "dns" {
   update {
     server = "192.168.1.105"
   }
+}
+
+provider "kubernetes" {
+  config_path = var.kubernetes_config_path
 }

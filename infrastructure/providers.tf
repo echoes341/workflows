@@ -14,6 +14,11 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "2.31.0"
     }
+
+    helm = {
+      source  = "hashicorp/helm"
+      version = "2.14.0"
+    }
   }
 }
 
@@ -29,4 +34,10 @@ provider "dns" {
 
 provider "kubernetes" {
   config_path = var.kubernetes_config_path
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = var.kubernetes_config_path
+  }
 }

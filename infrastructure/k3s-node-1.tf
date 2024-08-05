@@ -48,9 +48,9 @@ resource "proxmox_vm_qemu" "k3s-node-1" {
   }
 }
 
-resource "dns_a_record_set" "dns" {
+resource "dns_a_record_set" "k3s-node-1" {
   zone = "ross.in."
-  name = "k3s-node-1"
+  name = "k3s-1"
 
   addresses = ["192.168.1.110"]
 }

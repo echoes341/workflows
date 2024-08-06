@@ -16,6 +16,11 @@ resource "helm_release" "kafka" {
     name  = "listeners.client.protocol"
     value = "PLAINTEXT"
   }
+
+  set {
+    name  = "controller.replicaCount"
+    value = "1"
+  }
 }
 
 resource "kubernetes_deployment" "kafka-ui" {

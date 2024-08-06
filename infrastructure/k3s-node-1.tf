@@ -54,3 +54,29 @@ resource "dns_a_record_set" "k3s-node-1" {
 
   addresses = [var.ip_k3s_1]
 }
+
+resource "null_resource" "k3s-node-1-traefik-config" {
+  depends_on = [proxmox_vm_qemu.k3s-node-1]
+
+  connection {
+    type = "ssh"
+    host = var.ip_k3s_1
+    user = "root"
+  }
+
+  provisioner "file" {
+    content = <<-EOF
+      apiVersion: helm.cattle.io/v1
+      kind: HelmChartConfig
+      metadata:
+        name: traefik
+        namespace: kube-system
+      spec:
+        valuesContent: |-
+          globalArguments:
+            - "--serversTransport.insecureSkipVerify=true"
+    EOF
+
+    destination = "/var/lib/rancher/k3s/server/manifests/traefik-config.yaml"
+  }
+}

@@ -39,7 +39,7 @@ resource "helm_release" "openwhisk" {
 
   set {
     name  = "whisk.ingress.useInternally"
-    value = "false"
+    value = false
   }
 }
 
@@ -71,7 +71,7 @@ resource "kubernetes_ingress_v1" "openwhisk_k3s_ross_in" {
             service {
               name = "openwhisk-nginx"
               port {
-                name = "http"
+                name = "https"
               }
             }
           }

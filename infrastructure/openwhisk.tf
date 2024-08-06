@@ -65,7 +65,7 @@ resource "kubernetes_ingress_v1" "openwhisk_k3s_ross_in" {
       host = "openwhisk.k3s.ross.in"
       http {
         path {
-          path = "/"
+          path      = "/"
           path_type = "Prefix"
           backend {
             service {

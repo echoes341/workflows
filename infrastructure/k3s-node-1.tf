@@ -55,9 +55,9 @@ resource "dns_a_record_set" "k3s-node-1" {
   addresses = [var.ip_k3s_1]
 }
 
+# must have propagated ssh keys to the node
 resource "null_resource" "k3s-node-1-traefik-config" {
-  depends_on = [proxmox_vm_qemu.k3s-node-1]
-
+  depends_on = [proxmox_vm_qemu.k3s-node-1, dns_a_record_set.k3s-node-1]
   connection {
     type = "ssh"
     host = var.ip_k3s_1
@@ -78,5 +78,59 @@ resource "null_resource" "k3s-node-1-traefik-config" {
     EOF
 
     destination = "/var/lib/rancher/k3s/server/manifests/traefik-config.yaml"
+  }
+}
+
+resource "tls_private_key" "k3s-node-1" {
+  algorithm = "RSA"
+}
+
+resource "tls_self_signed_cert" "k3s-node-1" {
+  private_key_pem = tls_private_key.k3s-node-1.private_key_pem
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+  ]
+
+  validity_period_hours = 8760 # 1 year
+  early_renewal_hours   = 720  # 30 days
+
+  dns_names = ["${dns_a_record_set.k3s-node-1.name}.ross.in", "*.k3s.ross.in"]
+  subject {
+    common_name  = "${dns_a_record_set.k3s-node-1.name}.ross.in"
+    organization = "Ross"
+  }
+}
+
+resource "kubernetes_secret_v1" "k3s-traefik-cert" {
+  metadata {
+    name      = "ross-in-cert"
+    namespace = "kube-system"
+  }
+
+  data = {
+    "tls.crt" = tls_self_signed_cert.k3s-node-1.cert_pem
+    "tls.key" = tls_private_key.k3s-node-1.private_key_pem
+  }
+
+  type = "kubernetes.io/tls"
+}
+
+resource "kubernetes_manifest" "k3s-traefik-cert-config" {
+  manifest = {
+    apiVersion = "traefik.containo.us/v1alpha1"
+    kind       = "TLSStore"
+    metadata = {
+      name      = "default"
+      namespace = "kube-system"
+    }
+
+    spec = {
+      defaultCertificate = {
+        secretName = kubernetes_secret_v1.k3s-traefik-cert.metadata[0].name
+      }
+    }
   }
 }

@@ -3,12 +3,12 @@ resource "proxmox_vm_qemu" "k3s-node-1" {
   balloon                = 0
   bios                   = "seabios"
   boot                   = "order=scsi0;net0"
-  cores                  = 4
+  cores                  = 6
   cpu                    = "host"
   define_connection_info = false
   full_clone             = false
   hotplug                = "network,disk,usb"
-  memory                 = 4096
+  memory                 = 6144
   name                   = "K3S"
   onboot                 = true
   qemu_os                = "l26"
@@ -52,5 +52,5 @@ resource "dns_a_record_set" "k3s-node-1" {
   zone = "ross.in."
   name = "k3s-1"
 
-  addresses = ["192.168.1.110"]
+  addresses = [var.ip_k3s_1]
 }

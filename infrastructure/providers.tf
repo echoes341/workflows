@@ -28,7 +28,7 @@ provider "proxmox" {
 
 provider "dns" {
   update {
-    server = "192.168.1.105"
+    server = var.ip_dns_nameserver
   }
 }
 

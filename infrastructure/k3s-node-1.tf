@@ -3,6 +3,7 @@ resource "proxmox_vm_qemu" "k3s-node-1" {
   automatic_reboot       = true
   balloon                = 0
   bios                   = "seabios"
+  agent                  = 1
   boot                   = "order=scsi0;net0"
   cores                  = 6
   cpu                    = "host"

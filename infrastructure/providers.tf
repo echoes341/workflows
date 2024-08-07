@@ -24,6 +24,16 @@ terraform {
       source  = "hashicorp/tls"
       version = "4.0.5"
     }
+
+    http = {
+      source  = "hashicorp/http"
+      version = "3.4.4"
+    }
+
+    kustomization = {
+      source  = "kbst/kustomization"
+      version = "0.9.6"
+    }
   }
 }
 
@@ -45,4 +55,8 @@ provider "helm" {
   kubernetes {
     config_path = var.kubernetes_config_path
   }
+}
+
+provider "kustomization" {
+  kubeconfig_path = var.kubernetes_config_path
 }

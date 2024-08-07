@@ -1,3 +1,4 @@
+# install is left to the user
 resource "proxmox_vm_qemu" "k3s-node-1" {
   automatic_reboot       = true
   balloon                = 0
@@ -65,17 +66,21 @@ resource "null_resource" "k3s-node-1-traefik-config" {
   }
 
   provisioner "file" {
-    content = <<-EOF
-      apiVersion: helm.cattle.io/v1
-      kind: HelmChartConfig
-      metadata:
-        name: traefik
-        namespace: kube-system
-      spec:
-        valuesContent: |-
-          globalArguments:
-            - "--serversTransport.insecureSkipVerify=true"
-    EOF
+    content = yamlencode({
+      apiVersion = "helm.cattle.io/v1"
+      kind       = "HelmChartConfig"
+      metadata = {
+        name      = "traefik"
+        namespace = "kube-system"
+      }
+      spec = {
+        valuesContent = {
+          globalArguments = [
+            "--serversTransport.insecureSkipVerify=true"
+          ]
+        }
+      }
+    })
 
     destination = "/var/lib/rancher/k3s/server/manifests/traefik-config.yaml"
   }
